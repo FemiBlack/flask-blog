@@ -1,16 +1,15 @@
 import os
 import secrets
 from PIL import Image
-from flask import url_for
+from flask import url_for, current_app
 from flask_mail import Message
-from flaskblog import app, mail
-
+from flaskblog import mail
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
 
     # Resize the image dimension to save space
     output_size = (125, 125)
@@ -23,10 +22,10 @@ def save_picture(form_picture):
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message('Password Reset Request', sender='***REMOVED***', recipients=[user.email])
-    msg.body = f'''To reset your password visit the following link:
-{url_for('reset_token', token=token, _external=True)}
+    msg = Message('Password Reset Request', sender='femi.blvk@gmail.com', recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('users.reset_token', token=token, _external=True)}
 
-If you did not make this request then simply ignore this email and no changes would be made
-'''
+If you did not make this request then simply ignore this email and no change would be applied
+    '''
     mail.send(msg)
